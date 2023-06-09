@@ -111,7 +111,7 @@ def rotate_image_and_plot(img_path, rotation_angle=90, height=256, width=256):
     #img_array = tf.keras.preprocessing.image.img_to_array(image)
     img_array = tf.keras.utils.img_to_array(image)
     rotated_img_cropped = preprocess_image(img_array, rotation_angle, height=height, width=width, rotation_degree=rotation_angle, do_crop=True)
-    rotated_img = preprocess_image(img_array, rotation_angle, height=height, width=width,rotation_degree=0, do_crop=False)
+    rotated_img = preprocess_image(img_array, rotation_angle, height=height, width=width,rotation_degree=rotation_angle, do_crop=False)
 
     plt.figure(figsize=(10,10))
     ax = plt.subplot(4, 1, 1)
@@ -123,8 +123,6 @@ def rotate_image_and_plot(img_path, rotation_angle=90, height=256, width=256):
     plt.imshow(tf.keras.preprocessing.image.array_to_img(rotated_img_cropped[0]))
     ax = plt.subplot(4, 1, 4)
     plt.imshow(tf.keras.preprocessing.image.array_to_img(rotated_img[0]))
-
-    return image_resized, rotated_img
 
 
 
@@ -188,17 +186,17 @@ def preprocess_image(image, label_one_hot, height=224, width=224, rotation_degre
 
     # if height and width:
     # Resize the image to the specified height and width.
-    image = tf.expand_dims(image, 0)
+    #image = tf.expand_dims(image, 0)
     image = tf.image.resize(image, [height, width], method=tf.image.ResizeMethod.BILINEAR)
     # image = tf.image.resize_bilinear(image, [height, width], align_corners=False) method doesnt exist anymore
 
     # TODO: Maybe this is not needed? What does this do?
-    image = tf.squeeze(image, [0])
+    #image = tf.squeeze(image, [0])
 
     # image = tf.cast(image, tf.float32)
     # image = tf.multiply(image, 1/255.)
-    image = tf.subtract(image, 0.5)
-    image = tf.multiply(image, 2.0)
+    #image = tf.subtract(image, 0.5)
+    #image = tf.multiply(image, 2.0)
 
     return image, label_one_hot
 
