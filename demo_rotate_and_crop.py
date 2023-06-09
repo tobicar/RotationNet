@@ -1,7 +1,10 @@
 import math
+import time
+
 import cv2
 import numpy as np
-
+import tensorflow as tf
+import matplotlib.pyplot as plt
 
 def rotate_image(image, angle):
     """
@@ -76,36 +79,28 @@ def largest_rotated_rect(w, h, angle):
     """
     Given a rectangle of size wxh that has been rotated by 'angle' (in
     radians), computes the width and height of the largest possible
-    axis-aligned rectangle within the rotated rectangle.
-
-    Original JS code by 'Andri' and Magnus Hoff from Stack Overflow
-
-    Converted to Python by Aaron Snoswell
+    axis-aligned rectangle (maximal area) within the rotated rectangle.
     """
+    if w <= 0 or h <= 0:
+        return 0, 0
 
-    quadrant = int(math.floor(angle / (math.pi / 2))) & 3
-    sign_alpha = angle if ((quadrant & 1) == 0) else math.pi - angle
-    alpha = (sign_alpha % math.pi + math.pi) % math.pi
+    width_is_longer = w >= h
+    side_long, side_short = (w, h) if width_is_longer else (h, w)
 
-    bb_w = w * math.cos(alpha) + h * math.sin(alpha)
-    bb_h = w * math.sin(alpha) + h * math.cos(alpha)
+    # since the solutions for angle, -angle and 180-angle are all the same,
+    # if suffices to look at the first quadrant and the absolute values of sin,cos:
+    sin_a, cos_a = abs(math.sin(angle)), abs(math.cos(angle))
+    if side_short <= 2. * sin_a * cos_a * side_long or abs(sin_a - cos_a) < 1e-10:
+        # half constrained case: two crop corners touch the longer side,
+        #   the other two corners are on the mid-line parallel to the longer line
+        x = 0.5 * side_short
+        wr, hr = (x / sin_a, x / cos_a) if width_is_longer else (x / cos_a, x / sin_a)
+    else:
+        # fully constrained case: crop touches all 4 sides
+        cos_2a = cos_a * cos_a - sin_a * sin_a
+        wr, hr = (w * cos_a - h * sin_a) / cos_2a, (h * cos_a - w * sin_a) / cos_2a
 
-    gamma = math.atan2(bb_w, bb_w) if (w < h) else math.atan2(bb_w, bb_w)
-
-    delta = math.pi - alpha - gamma
-
-    length = h if (w < h) else w
-
-    d = length * math.cos(alpha)
-    a = d * math.sin(alpha) / math.sin(delta)
-
-    y = a * math.cos(gamma)
-    x = y * math.tan(gamma)
-
-    return (
-        bb_w - 2 * x,
-        bb_h - 2 * y
-    )
+    return wr, hr
 
 
 def crop_around_center(image, width, height):
@@ -172,4 +167,33 @@ def demo():
 
 
 if __name__ == "__main__":
-    demo()
+    def rotate_image_and_plot(img_path, rotation_angle=90, height=256, width=256):
+        # image = tf.keras.preprocessing.image.load_img(img_path)
+        image = tf.keras.utils.load_img(img_path)
+        # img_array = tf.keras.preprocessing.image.img_to_array(image)
+        img_array = tf.keras.utils.img_to_array(image)
+        rotated_img = rotate_image(img_array, rotation_angle)
+        image_height = img_array.shape[0]
+        image_width = img_array.shape[1]
+        image_rotated_cropped = crop_around_center(rotated_img,
+            *largest_rotated_rect(
+                image_width,
+                image_height,
+                math.radians(rotation_angle)
+            )
+        )
+
+        plt.figure(figsize=(10, 10))
+        ax = plt.subplot(3, 1, 1)
+        plt.imshow(image)
+        ax = plt.subplot(3, 1, 2)
+        plt.imshow(tf.keras.preprocessing.image.array_to_img(rotated_img))
+        ax = plt.subplot(3, 1, 3)
+        plt.imshow(tf.keras.preprocessing.image.array_to_img(image_rotated_cropped))
+        plt.show()
+
+
+
+    rotate_image_and_plot("image.jpg", 180)
+    while True:
+        time.sleep(1)
