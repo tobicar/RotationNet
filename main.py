@@ -69,7 +69,7 @@ def largest_rotated_rect(w, h, angle):
         bb_h - 2 * y
     )
 
-
+##
 def rotate_and_crop(image, output_height, output_width, rotation_degree, do_crop):
     """Rotate the given image with the given rotation degree and crop for the black edges if necessary
     Args:
@@ -82,7 +82,6 @@ def rotate_and_crop(image, output_height, output_width, rotation_degree, do_crop
     Returns:
         A rotated image.
     """
-
     # Rotate the given image with the given rotation degree
     if rotation_degree != 0:
         image_pil = tf.keras.utils.array_to_img(image)
@@ -95,7 +94,9 @@ def rotate_and_crop(image, output_height, output_width, rotation_degree, do_crop
 
         # Center crop to ommit black noise on the edges
         if do_crop == True:
-            lrr_width, lrr_height = largest_rotated_rect(output_height, output_width, math.radians(rotation_degree))
+            lrr_width, lrr_height = largest_rotated_rect(output_width, output_height, math.radians(rotation_degree))
+            print(lrr_width, lrr_height)
+            print("central cropped: " + str(float(lrr_height) / output_height))
             resized_image = tf.image.central_crop(image, float(lrr_height) / output_height)
             image = tf.image.resize(resized_image, [output_height, output_width],
                                     method=tf.image.ResizeMethod.BILINEAR)
@@ -109,17 +110,21 @@ def rotate_image_and_plot(img_path, rotation_angle=90, height=256, width=256):
     image = tf.keras.utils.load_img(img_path)
     #img_array = tf.keras.preprocessing.image.img_to_array(image)
     img_array = tf.keras.utils.img_to_array(image)
-    rotated_img_cropped = preprocess_image(img_array,rotation_angle, height=256, width=256, rotation_degree=rotation_angle, do_crop=True)
-    rotated_img = preprocess_image(img_array, rotation_angle, height=256, width=256,
-                                           rotation_degree=rotation_angle, do_crop=False)
+    rotated_img_cropped = preprocess_image(img_array, rotation_angle, height=height, width=width, rotation_degree=rotation_angle, do_crop=True)
+    rotated_img = preprocess_image(img_array, rotation_angle, height=height, width=width,rotation_degree=0, do_crop=False)
 
     plt.figure(figsize=(10,10))
-    ax = plt.subplot(3, 1, 1)
+    ax = plt.subplot(4, 1, 1)
     plt.imshow(image)
-    ax = plt.subplot(3, 1, 2)
+    ax = plt.subplot(4, 1, 2)
+    image_resized = tf.image.resize(img_array, [height, width], method=tf.image.ResizeMethod.BILINEAR)
+    plt.imshow(tf.keras.preprocessing.image.array_to_img(image_resized))
+    ax = plt.subplot(4, 1, 3)
     plt.imshow(tf.keras.preprocessing.image.array_to_img(rotated_img_cropped[0]))
-    ax = plt.subplot(3, 1, 3)
+    ax = plt.subplot(4, 1, 4)
     plt.imshow(tf.keras.preprocessing.image.array_to_img(rotated_img[0]))
+
+    return image_resized, rotated_img
 
 
 
@@ -176,14 +181,18 @@ def preprocess_image(image, label_one_hot, height=224, width=224, rotation_degre
     # the original image.
     # if central_fraction:
     #  image = tf.image.central_crop(image, central_fraction=central_fraction)
-
-    image = rotate_and_crop(image, height, width, rotation_degree, do_crop)
+    print(image.shape)
+    image_height = image.shape[0]
+    image_width = image.shape[1]
+    image = rotate_and_crop(image, image_height, image_width, rotation_degree, do_crop)
 
     # if height and width:
     # Resize the image to the specified height and width.
     image = tf.expand_dims(image, 0)
     image = tf.image.resize(image, [height, width], method=tf.image.ResizeMethod.BILINEAR)
-    # image = tf.image.resize_bilinear(image, [height, width], align_corners=False)
+    # image = tf.image.resize_bilinear(image, [height, width], align_corners=False) method doesnt exist anymore
+
+    # TODO: Maybe this is not needed? What does this do?
     image = tf.squeeze(image, [0])
 
     # image = tf.cast(image, tf.float32)
