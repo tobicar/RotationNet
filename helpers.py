@@ -153,22 +153,46 @@ def rotate_image_and_plot(img_path, rotation_angle=90):
     ax = plt.subplot(3, 1, 1)
     plt.imshow(image)
     ax = plt.subplot(3, 1, 2)
-    plt.imshow(tf.keras.preprocessing.image.array_to_img(rotated_img))
+    plt.imshow(tf.keras.utils.array_to_img(rotated_img))
     ax = plt.subplot(3, 1, 3)
-    plt.imshow(tf.keras.preprocessing.image.array_to_img(image_rotated_cropped))
+    plt.imshow(tf.keras.utils.array_to_img(image_rotated_cropped))
 
 
-def rotate_image_and_crop(img_array, rotation_angle):
-    image_height = img_array.shape[0]
-    image_width = img_array.shape[1]
-    image_rotated = rotate_image(img_array, rotation_angle)
-    image_rotated_cropped = crop_around_center(
-        image_rotated,
-        *largest_rotated_rect(
-            image_width,
-            image_height,
-            math.radians(rotation_angle)
+def rotate_image_and_plot_from_array(img_arr, rotation_angle=90):
+    image_rotated_cropped = rotate_image_and_crop(img_arr , rotation_angle)
+
+    plt.figure(figsize=(10, 10))
+    ax = plt.subplot(2, 1, 1)
+    if len(img_arr.shape) != 3:
+        plt.imshow(tf.keras.utils.array_to_img(np.expand_dims(img_arr,axis=-1)))
+    else:
+        plt.imshow(tf.keras.utils.array_to_img(img_arr))
+    ax = plt.subplot(2, 1, 2)
+    if len(image_rotated_cropped.shape) != 3:
+        plt.imshow(tf.keras.utils.array_to_img(np.expand_dims(image_rotated_cropped, axis=-1)))
+    else:
+        plt.imshow(tf.keras.utils.array_to_img(image_rotated_cropped))
+
+
+def rotate_image_and_crop(image, rotation_angle):
+    def _rotate_image_and_crop(image, angle):
+        image = image.numpy() if tf.is_tensor(image) else image
+        image_height = image.shape[0]
+        image_width = image.shape[1]
+        rotation_angle = angle.numpy() if tf.is_tensor(angle) else angle
+        if isinstance(rotation_angle, float):
+            rotation_angle = math.radians(rotation_angle)
+        image = np.array(image, dtype=np.uint8)  # Convert to NumPy array
+        image_rotated = rotate_image(image, rotation_angle)
+        image_rotated_cropped = crop_around_center(
+            image_rotated,
+            *largest_rotated_rect(
+                image_width,
+                image_height,
+                rotation_angle
+            )
         )
-    )
-    return image_rotated_cropped
+        return image_rotated_cropped
+
+    return tf.py_function(_rotate_image_and_crop, [image, rotation_angle], tf.float32)
 
