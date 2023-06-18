@@ -12,7 +12,110 @@ from PIL import Image
 import helpers
 
 ##
-helpers.rotate_image_and_plot("image.jpg",45)
+helpers.rotate_image_and_plot("val2017/000000013348.jpg",45)
+
+## read dataset from disk
+batch_size = 32
+img_height = 224
+img_width = 224
+data_dir = "part9/"
+train_ds = tf.keras.utils.image_dataset_from_directory(
+    data_dir,
+    labels=None,
+    validation_split=0.2,
+    subset="training",
+    seed=123,
+    image_size=(img_height, img_width),
+    batch_size=None
+)
+##
+val_ds = tf.keras.utils.image_dataset_from_directory(
+  data_dir,
+    labels= None,
+  validation_split=0.2,
+  subset="validation",
+  seed=123,
+  image_size=(img_height, img_width),
+  batch_size=batch_size)
+##
+rotation_angles = tf.random.uniform(shape=(len(train_ds),), minval=0, maxval=359, dtype=tf.int32)
+
+##
+rotation_angles_dataset = tf.data.Dataset.from_tensor_slices(rotation_angles)
+train_ds_with_labels = tf.data.Dataset.zip((train_ds, rotation_angles_dataset))
+##
+@tf.function
+def rotate_img(img, label):
+    # Load the raw data from the file as a string
+    #img = tf.io.read_file(file_path)
+    rotated_image = tf.numpy_function(helpers.rotate_image_and_crop, [img, label], tf.float32)
+    #img = helpers.rotate_image_and_crop(img, label)
+    label_one_hot = tf.one_hot(label, 360)
+    return rotated_image, label_one_hot
+##
+train_ds_with_labels = train_ds_with_labels.map(rotate_img)
+
+
+##
+train_ds_with_labels = train_ds_with_labels.batch(32)
+##
+plt.figure(figsize=(10, 10))
+for images, labels in train_ds_with_labels.take(1):
+    for i in range(9):
+        ax = plt.subplot(3, 3, i + 1)
+        plt.imshow(images[i].numpy().astype("uint8"))
+        plt.title(labels[i].numpy())
+        plt.axis("off")
+
+##
+def angle_difference(x, y):
+    """
+    Calculate minimum difference between two angles.
+    """
+    return 180 - abs(abs(x - y) - 180)
+
+
+def angle_error(y_true, y_pred):
+    """
+    Calculate the mean diference between the true angles
+    and the predicted angles. Each angle is represented
+    as a binary vector.
+    """
+    diff = angle_difference(tf.keras.backend.argmax(y_true), tf.keras.backend.argmax(y_pred))
+    return tf.keras.backend.mean(tf.keras.backend.cast(K.abs(diff), tf.keras.backend.floatx()))
+
+## build model
+input_shape = (224, 224, 3)
+base_model = tf.keras.applications.mobilenet_v2.MobileNetV2(weights='imagenet', include_top=False, input_shape=input_shape)
+base_model.trainable = False
+
+classes = 360
+inputs = tf.keras.Input(shape=input_shape)
+preprocess_layer = tf.keras.applications.mobilenet_v2.preprocess_input(inputs)
+base_model = base_model(preprocess_layer)
+
+head = tf.keras.layers.Flatten()(base_model)
+head = tf.keras.layers.Dense(512)(head)
+head = tf.keras.layers.BatchNormalization()(head)
+head = tf.keras.layers.Dropout(0.2)(head)
+output = tf.keras.layers.Dense(classes, activation='softmax', name="RotationNetHead")(head)
+
+model = tf.keras.Model(inputs, output, name="RotationNet")
+
+##
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', angle_error])
+##
+model.fit(train_ds_with_labels, epochs=5)
+## predict image
+
+img = tf.keras.utils.load_img("val2017/000000003156.jpg")
+img_arr = tf.keras.utils.img_to_array(img)
+rot_img = helpers.rotate_image_and_crop(img_arr, 45)
+img_arr_resized = tf.image.resize(rot_img, [224, 224])
+img_exp = np.expand_dims(img_arr_resized, axis=0)
+##
+pred = model.predict(img_exp)
+
 
 ##
 # we don't need the labels indicating the digit value, so we only load the images

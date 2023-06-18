@@ -79,3 +79,5 @@ fabric.properties
 #custom ignores
 # Ignore Folder
 images/
+/val2017/
+/part9/
