@@ -22,7 +22,7 @@ data_dir = "part9/"
 train_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
     labels=None,
-    validation_split=0.2,
+    validation_split=0.15,
     subset="training",
     seed=123,
     image_size=(img_height, img_width),
@@ -32,7 +32,7 @@ train_ds = tf.keras.utils.image_dataset_from_directory(
 val_ds = tf.keras.utils.image_dataset_from_directory(
   data_dir,
     labels= None,
-  validation_split=0.2,
+  validation_split=0.15,
   subset="validation",
   seed=123,
   image_size=(img_height, img_width),
@@ -103,9 +103,11 @@ output = tf.keras.layers.Dense(classes, activation='softmax', name="RotationNetH
 model = tf.keras.Model(inputs, output, name="RotationNet")
 
 ##
+tf.keras.utils.plot_model(model, to_file="model.png", show_shapes=True)
+##
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', angle_error])
 ##
-model.fit(train_ds_with_labels, epochs=5)
+history = model.fit(train_ds_with_labels, epochs=5)
 ## predict image
 
 img = tf.keras.utils.load_img("val2017/000000003156.jpg")

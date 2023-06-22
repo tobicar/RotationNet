@@ -150,6 +150,7 @@ def rotate_image_and_plot(img_path, rotation_angle=90):
     )
 
     plt.figure(figsize=(10, 10))
+    plt.subplots_adjust(top=0.9, hspace=0.3)
     ax1 = plt.subplot(3, 1, 1)
     ax1.title.set_text("Original image")
     plt.imshow(image)
