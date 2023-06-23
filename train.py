@@ -19,24 +19,15 @@ batch_size = 32
 img_height = 224
 img_width = 224
 data_dir = "part9/"
-train_ds = tf.keras.utils.image_dataset_from_directory(
+train_ds, val_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
     labels=None,
     validation_split=0.15,
-    subset="training",
+    subset="both",
     seed=123,
     image_size=(img_height, img_width),
     batch_size=None
 )
-##
-val_ds = tf.keras.utils.image_dataset_from_directory(
-  data_dir,
-    labels= None,
-  validation_split=0.15,
-  subset="validation",
-  seed=123,
-  image_size=(img_height, img_width),
-  batch_size=batch_size)
 ##
 rotation_angles = tf.random.uniform(shape=(len(train_ds),), minval=0, maxval=359, dtype=tf.int32)
 

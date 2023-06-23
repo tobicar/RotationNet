@@ -1,10 +1,11 @@
 import math
 import time
-
+import keras.backend as K
 import cv2
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+
 
 def rotate_image(image, angle):
     """
@@ -33,10 +34,10 @@ def rotate_image(image, angle):
 
     # Obtain the rotated coordinates of the image corners
     rotated_coords = [
-        (np.array([-image_w2,  image_h2]) * rot_mat_notranslate).A[0],
-        (np.array([ image_w2,  image_h2]) * rot_mat_notranslate).A[0],
+        (np.array([-image_w2, image_h2]) * rot_mat_notranslate).A[0],
+        (np.array([image_w2, image_h2]) * rot_mat_notranslate).A[0],
         (np.array([-image_w2, -image_h2]) * rot_mat_notranslate).A[0],
-        (np.array([ image_w2, -image_h2]) * rot_mat_notranslate).A[0]
+        (np.array([image_w2, -image_h2]) * rot_mat_notranslate).A[0]
     ]
 
     # Find the size of the new image
@@ -75,7 +76,6 @@ def rotate_image(image, angle):
     )
 
     return result
-
 
 
 def largest_rotated_rect(w, h, angle):
@@ -119,10 +119,10 @@ def crop_around_center(image, width, height):
     image_size = (image.shape[1], image.shape[0])
     image_center = (int(image_size[0] * 0.5), int(image_size[1] * 0.5))
 
-    if(width > image_size[0]):
+    if (width > image_size[0]):
         width = image_size[0]
 
-    if(height > image_size[1]):
+    if (height > image_size[1]):
         height = image_size[1]
 
     x1 = int(image_center[0] - width * 0.5)
@@ -142,12 +142,12 @@ def rotate_image_and_plot(img_path, rotation_angle=90):
     image_height = img_array.shape[0]
     image_width = img_array.shape[1]
     image_rotated_cropped = crop_around_center(rotated_img,
-        *largest_rotated_rect(
-            image_width,
-            image_height,
-            math.radians(rotation_angle)
-        )
-    )
+                                               *largest_rotated_rect(
+                                                   image_width,
+                                                   image_height,
+                                                   math.radians(rotation_angle)
+                                               )
+                                               )
 
     plt.figure(figsize=(10, 10))
     plt.subplots_adjust(top=0.9, hspace=0.3)
@@ -163,12 +163,12 @@ def rotate_image_and_plot(img_path, rotation_angle=90):
 
 
 def rotate_image_and_plot_from_array(img_arr, rotation_angle=90):
-    image_rotated_cropped = rotate_image_and_crop(img_arr , rotation_angle)
+    image_rotated_cropped = rotate_image_and_crop(img_arr, rotation_angle)
 
     plt.figure(figsize=(10, 10))
     ax = plt.subplot(2, 1, 1)
     if len(img_arr.shape) != 3:
-        plt.imshow(tf.keras.utils.array_to_img(np.expand_dims(img_arr,axis=-1)))
+        plt.imshow(tf.keras.utils.array_to_img(np.expand_dims(img_arr, axis=-1)))
     else:
         plt.imshow(tf.keras.utils.array_to_img(img_arr))
     ax = plt.subplot(2, 1, 2)
@@ -179,13 +179,13 @@ def rotate_image_and_plot_from_array(img_arr, rotation_angle=90):
 
 
 def rotate_image_and_crop(image, rotation_angle):
-    #image = image.numpy() if tf.is_tensor(image) else image
+    # image = image.numpy() if tf.is_tensor(image) else image
     image_height = image.shape[0]
     image_width = image.shape[1]
-    #rotation_angle = rotation_angle.numpy() if tf.is_tensor(rotation_angle) else rotation_angle
-    #if isinstance(rotation_angle, float):
+    # rotation_angle = rotation_angle.numpy() if tf.is_tensor(rotation_angle) else rotation_angle
+    # if isinstance(rotation_angle, float):
     #    rotation_angle = math.radians(rotation_angle)
-    #image = np.array(image, dtype=np.uint8)  # Convert to NumPy array
+    # image = np.array(image, dtype=np.uint8)  # Convert to NumPy array
     image_rotated = rotate_image(image, rotation_angle)
     image_rotated_cropped = crop_around_center(
         image_rotated,
@@ -198,3 +198,18 @@ def rotate_image_and_crop(image, rotation_angle):
     return tf.image.resize(image_rotated_cropped, [image_height, image_width])
 
 
+def angle_difference(x, y):
+    """
+    Calculate minimum difference between two angles.
+    """
+    return 180 - abs(abs(x - y) - 180)
+
+
+def angle_error(y_true, y_pred):
+    """
+    Calculate the mean diference between the true angles
+    and the predicted angles. Each angle is represented
+    as a binary vector.
+    """
+    diff = angle_difference(tf.keras.backend.argmax(y_true), tf.keras.backend.argmax(y_pred))
+    return tf.keras.backend.mean(tf.keras.backend.cast(K.abs(diff), tf.keras.backend.floatx()))
