@@ -47,12 +47,12 @@ val_ds_with_labels = tf.data.Dataset.zip((val_ds, rotation_angles_dataset_val))
 train_ds_with_labels = train_ds_with_labels.map(rotate_img)
 val_ds_with_labels = val_ds_with_labels.map(rotate_img)
 ## batch the datasets
-train_ds_with_labels = train_ds_with_labels.batch(32)
-val_ds_with_labels = val_ds_with_labels.batch(32)
+train_ds_with_labels = train_ds_with_labels.batch(64)
+val_ds_with_labels = val_ds_with_labels.batch(64)
 ## build transfer learning model
 input_shape = (224, 224, 3)
 base_model = tf.keras.applications.mobilenet_v2.MobileNetV2(weights='imagenet', include_top=False, input_shape=input_shape)
-base_model.trainable = True  #freeze layers of the backbone model and only train custom head
+base_model.trainable = False  #freeze layers of the backbone model and only train custom head
 
 classes = 360
 inputs = tf.keras.Input(shape=input_shape)
@@ -60,9 +60,10 @@ preprocess_layer = tf.keras.applications.mobilenet_v2.preprocess_input(inputs)
 base_model = base_model(preprocess_layer)
 
 head = tf.keras.layers.GlobalAvgPool2D()(base_model)
-head = tf.keras.layers.Dense(512)(head)
-head = tf.keras.layers.BatchNormalization()(head)
-head = tf.keras.layers.Dropout(0.2)(head)
+#head = tf.keras.layers.GlobalAvgPool2D()(base_model)
+#head = tf.keras.layers.Dense(512)(head)
+#head = tf.keras.layers.BatchNormalization()(head)
+#head = tf.keras.layers.Dropout(0.2)(head)
 output = tf.keras.layers.Dense(classes, activation='softmax', name="RotationNetHead")(head)
 
 model = tf.keras.Model(inputs, output, name="RotationNet")
