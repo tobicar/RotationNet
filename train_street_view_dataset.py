@@ -5,17 +5,15 @@ from keras.callbacks import EarlyStopping, TensorBoard
 from keras.datasets import mnist
 import keras.backend as K
 import scipy.ndimage as ndimage
-from RotationNetGenerator import RotNetDataGenerator
 import math
 import matplotlib.pyplot as plt
 from PIL import Image
 import helpers
 
 ## read dataset from disk
-batch_size = 32
 img_height = 224
 img_width = 224
-data_dir = "part9/"
+data_dir = "data/part9/"
 train_ds, val_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
     labels=None,
@@ -51,7 +49,6 @@ train_ds_with_labels = train_ds_with_labels.batch(64)
 val_ds_with_labels = val_ds_with_labels.batch(64)
 ## build transfer learning model
 input_shape = (224, 224, 3)
-tf.keras.applications.resnet
 base_model = tf.keras.applications.mobilenet_v2.MobileNetV2(weights='imagenet', include_top=False, input_shape=input_shape)
 base_model.trainable = False  #freeze layers of the backbone model and only train custom head
 
@@ -74,6 +71,7 @@ tf.keras.utils.plot_model(model, to_file="model.png", show_shapes=True)
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', helpers.angle_error])
 ##
 history = model.fit(train_ds_with_labels, validation_data= val_ds_with_labels, epochs=10)
+np.save('models_history/street_view_100Epoch.npy', history.history)
 ## plot the training history (loss)
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
@@ -90,4 +88,6 @@ plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['train', 'val'], loc='upper left')
 plt.show()
+
+model.save("models/street_view_100Epoch")
 

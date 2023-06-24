@@ -11,10 +11,9 @@ from PIL import Image
 import helpers
 
 ## read dataset from disk
-batch_size = 32
 img_height = 224
 img_width = 224
-data_dir = "data/streetView"
+data_dir = "data/val2017"
 train_ds, val_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
     labels=None,
@@ -66,12 +65,14 @@ head = tf.keras.layers.Dropout(0.4)(head)
 output = tf.keras.layers.Dense(classes, activation='softmax', name="RotationNetHead")(head)
 
 model = tf.keras.Model(inputs, output, name="RotationNet")
+## plot structure of the model to file, if wanted
+tf.keras.utils.plot_model(model, to_file="model_new.png", show_shapes=True)
 ## compile model with adam optimizer and categorical_crossentropy (labels are one-hot encoded); use custom angle_error metric
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', helpers.angle_error])
 ##
 history = model.fit(train_ds_with_labels, validation_data= val_ds_with_labels, epochs=100)
 ## plot the training history (loss)
-np.save('my_history.npy',history.history)
+np.save('models_history/coco_100Epoch.npy',history.history)
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
 plt.title('model loss')
@@ -88,4 +89,4 @@ plt.xlabel('epoch')
 plt.legend(['train', 'val'], loc='upper left')
 plt.show()
 
-model.save("models/street_view_100Epoch_new")
+model.save("models/coco_100Epoch")

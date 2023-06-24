@@ -5,7 +5,6 @@ from keras.callbacks import EarlyStopping, TensorBoard
 from keras.datasets import mnist
 import keras.backend as K
 import scipy.ndimage as ndimage
-from RotationNetGenerator import RotNetDataGenerator
 import math
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -13,7 +12,7 @@ import helpers
 import os
 
 ## read dataset from disk -> not needed anymore
-data_dir = "val2017_rotated"
+data_dir = "data/val2017_rotated"
 # list with image paths
 image_paths = [os.path.join(data_dir, filename) for filename in os.listdir(data_dir)]
 
