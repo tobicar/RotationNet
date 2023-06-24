@@ -12,7 +12,7 @@ from PIL import Image
 import helpers
 import os
 
-## read dataset from disk
+## read dataset from disk -> not needed anymore
 data_dir = "val2017_rotated"
 # list with image paths
 image_paths = [os.path.join(data_dir, filename) for filename in os.listdir(data_dir)]
@@ -66,8 +66,9 @@ output = tf.keras.layers.Dense(classes, activation='softmax', name="RotationNetH
 
 model = tf.keras.Model(inputs, output, name="RotationNet")
 ## plot structure of the model to file, if wanted
-tf.keras.utils.plot_model(model, to_file="model.png", show_shapes=True)
+tf.keras.utils.plot_model(model, to_file="model_rotated_coco_dataset.png", show_shapes=True)
 ## compile model with adam optimizer and categorical_crossentropy (labels are one-hot encoded); use custom angle_error metric
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', helpers.angle_error])
 ##
-history = model.fit(train_ds, validation_data= val_ds, epochs=10)
+history = model.fit(train_ds, validation_data= val_ds, epochs=100)
+##
