@@ -1,27 +1,30 @@
 import os
 import shutil
+# file copies images from a folder structurized to another one
+# imagesfilename structure in source folder "name_name_angle_"specificangle".jpg
+# creates subfolder for each rotation class in destination folder
 
-# Pfad zum Ordner mit den Bildern
+# path to folder with images
 image_folder = "val2017_rotated"
 
-# Zielordner für die sortierten Bilder erstellen
+# create destination folder for sorted pictures
 sorted_folder = "val2017_rotated_subfolder"
 os.makedirs(sorted_folder, exist_ok=True)
 
-# Alle Bilder im Ordner auflisten
+# list all images in folder
 image_files = os.listdir(image_folder)
 
-# Bilder in separate Unterordner basierend auf ihren Winkeln verschieben
+
 for image_file in image_files:
-    # Den Winkel aus dem Dateinamen extrahieren
+    # extract angle from filename
     angle = image_file.split("_")[2]
 
-    # Den Pfad zum aktuellen Bild erstellen
+    # create path to actual image
     image_path = os.path.join(image_folder, image_file)
 
-    # Den Pfad zum Zielordner für den aktuellen Winkel erstellen
+    # create path to destination dir for the current angle
     angle_folder = os.path.join(sorted_folder, angle)
     os.makedirs(angle_folder, exist_ok=True)
 
-    # Das Bild in den entsprechenden Unterordner verschieben
+    # move image in specific folder
     shutil.move(image_path, os.path.join(angle_folder, image_file))
