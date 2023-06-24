@@ -51,6 +51,7 @@ train_ds_with_labels = train_ds_with_labels.batch(64)
 val_ds_with_labels = val_ds_with_labels.batch(64)
 ## build transfer learning model
 input_shape = (224, 224, 3)
+tf.keras.applications.resnet
 base_model = tf.keras.applications.mobilenet_v2.MobileNetV2(weights='imagenet', include_top=False, input_shape=input_shape)
 base_model.trainable = False  #freeze layers of the backbone model and only train custom head
 
