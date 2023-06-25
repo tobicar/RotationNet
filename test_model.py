@@ -6,14 +6,14 @@ from PIL import Image
 import helpers
 
 ## load model
-#model_path = "models/street_view_100Epoch"
-model_path = "models/coco_100Epoch"
+model_path = "models/street_view_100Epoch"
+#model_path = "models/coco_100Epoch"
 model = tf.keras.models.load_model(model_path, custom_objects={"angle_error": helpers.angle_error}, compile=False)
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', helpers.angle_error])
 ## rotate and predict image
 
-#file_path = "data/street_view/008954_2.jpg"  # select filepath for prediction
-file_path = "data/coco/000000084477.jpg"  # select filepath for prediction
+file_path = "data/street_view/008954_2.jpg"  # select filepath for prediction
+#file_path = "data/coco/000000084477.jpg"  # select filepath for prediction
 rotation_angles = [80, 190, 280, 40]
 
 ## take picture and predict some random rotations of the image
