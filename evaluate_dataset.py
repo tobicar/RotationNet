@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import helpers
 ## specifiy data path and path of the trained model
-data_dir = "data/street_view/"
-model_path = "models/street_view_100Epoch"
+data_dir = "data/coco/"
+model_path = "models/coco_100Epoch"
 ## read dataset from disk
 img_height = 224
 img_width = 224

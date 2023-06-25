@@ -1,11 +1,6 @@
 ##
 import tensorflow as tf
 import numpy as np
-from keras.callbacks import EarlyStopping, TensorBoard
-from keras.datasets import mnist
-import keras.backend as K
-import scipy.ndimage as ndimage
-import math
 import matplotlib.pyplot as plt
 from PIL import Image
 import helpers
@@ -17,7 +12,6 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 ## rotate and predict image
 
 file_path = "data/street_view/008954_2.jpg"  # select filepath for prediction
-file_path = "/Users/tobias/Downloads/bild_2.jpg"
 rotation_angle = 180  # specifiy rotation angle
 # randomly rotate an image
 img = tf.keras.utils.load_img(file_path)

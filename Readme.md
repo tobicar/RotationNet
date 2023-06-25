@@ -28,6 +28,8 @@ Estimation of image rotation angle with convolutional neural networks
   - This script reads the saved history of a trained model and generates a loss and an angle error plot.
 - [helpers.py](helpers.py)
   - This script contains helper functions necessary for training, evaluation and testing.  These are on the one hand image rotation functions, custom loss functions and plot functions.
+- [test_model.py](test_model.py)
+  - Script to test different rotations of an image with a trained model.
 - Files that are no longer used:
   - [rotate_and_save_to_file.py](rotate_and_save_to_file.py)
     - File loads images from a specified folder and stores them in a new folder randomly rotated. The target structure is such that one folder is created per rotation angle.
