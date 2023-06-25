@@ -10,7 +10,8 @@ from PIL import Image
 import helpers
 
 ##
-history_path = "models_history/coco_100Epoch.npy"
+#history_path = "models_history/coco_100Epoch.npy"
+history_path = "models_history/street_view_100Epoch.npy"
 history = np.load(history_path, allow_pickle=True).item()
 
 ## plot the training history (loss)

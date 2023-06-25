@@ -11,13 +11,14 @@ from PIL import Image
 import helpers
 
 ##
-model_path = "models/coco_100Epoch"
+model_path = "models/street_view_100Epoch"
 model = tf.keras.models.load_model(model_path, custom_objects={"angle_error": helpers.angle_error}, compile=False)
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', helpers.angle_error])
 ## rotate and predict image
 
-file_path = "data/val2017/000000524850.jpg"  # select filepath for prediction
-rotation_angle = 90  # specifiy rotation angle
+file_path = "data/part9/008954_2.jpg"  # select filepath for prediction
+file_path = "/Users/tobias/Downloads/bild_2.jpg"
+rotation_angle = 180  # specifiy rotation angle
 # randomly rotate an image
 img = tf.keras.utils.load_img(file_path)
 img_arr = tf.keras.utils.img_to_array(img)
