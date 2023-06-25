@@ -79,5 +79,5 @@ fabric.properties
 #custom ignores
 # Ignore Folder
 images/
-/data/val2017/
-/data/part9/
+/data/coco/
+/data/street_view/

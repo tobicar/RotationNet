@@ -12,7 +12,7 @@ import helpers
 import os
 
 ## read dataset from disk -> not needed anymore
-data_dir = "data/val2017_rotated"
+data_dir = "data/coco_rotated"
 # list with image paths
 image_paths = [os.path.join(data_dir, filename) for filename in os.listdir(data_dir)]
 
@@ -31,7 +31,7 @@ validation_split = 0.2
 
 ##
 train_ds, val_ds = tf.keras.preprocessing.image_dataset_from_directory(
-    "val2017_rotated",
+    "coco_rotated",
     labels="inferred",
     label_mode='int',
     color_mode='rgb',

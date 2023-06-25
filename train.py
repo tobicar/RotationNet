@@ -11,13 +11,13 @@ from PIL import Image
 import helpers
 
 ##
-helpers.rotate_image_and_plot("data/val2017/000000013348.jpg", 45)
+helpers.rotate_image_and_plot("data/coco/000000013348.jpg", 45)
 
 ## read dataset from disk
 batch_size = 32
 img_height = 224
 img_width = 224
-data_dir = "data/part9/"
+data_dir = "data/street_view/"
 train_ds, val_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
     labels=None,
@@ -100,7 +100,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 history = model.fit(train_ds_with_labels, epochs=5)
 ## predict image
 
-img = tf.keras.utils.load_img("data/val2017/000000003156.jpg")
+img = tf.keras.utils.load_img("data/coco/000000003156.jpg")
 img_arr = tf.keras.utils.img_to_array(img)
 rot_img = helpers.rotate_image_and_crop(img_arr, 45)
 img_arr_resized = tf.image.resize(rot_img, [224, 224])

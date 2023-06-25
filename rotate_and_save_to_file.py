@@ -5,8 +5,8 @@ import tensorflow as tf
 import helpers
 
 # Pfad zum Ordner mit den Bildern
-folder_path = "data/val2017"
-output_folder_path = "data/val2017_rotated"
+folder_path = "data/coco"
+output_folder_path = "data/coco_rotated"
 
 rotation_angles_train = tf.random.uniform(shape=(len(os.listdir(folder_path)),), minval=0, maxval=359, dtype=tf.int32, seed=123)
 ##

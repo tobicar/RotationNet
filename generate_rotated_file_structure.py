@@ -5,7 +5,7 @@ import shutil
 # creates subfolder for each rotation class in destination folder
 
 # path to folder with images
-image_folder = "val2017_rotated"
+image_folder = "coco_rotated"
 
 # create destination folder for sorted pictures
 sorted_folder = "val2017_rotated_subfolder"

@@ -1,8 +1,6 @@
 ##
 import tensorflow as tf
 import numpy as np
-from keras.callbacks import EarlyStopping, TensorBoard
-from keras.datasets import mnist
 import keras.backend as K
 import scipy.ndimage as ndimage
 import math
@@ -13,7 +11,7 @@ import helpers
 ## read dataset from disk
 img_height = 224
 img_width = 224
-data_dir = "data/part9/"
+data_dir = "data/street_view/"
 train_ds, val_ds = tf.keras.utils.image_dataset_from_directory(
     data_dir,
     labels=None,
