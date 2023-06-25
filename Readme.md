@@ -30,8 +30,11 @@ Estimation of image rotation angle with convolutional neural networks
   - This script contains helper functions necessary for training, evaluation and testing.  These are on the one hand image rotation functions, custom loss functions and plot functions.
 - Files that are no longer used:
   - [rotate_and_save_to_file.py](rotate_and_save_to_file.py)
+    - File loads images from a specified folder and stores them in a new folder randomly rotated. The target structure is such that one folder is created per rotation angle.
   - [generate_rotated_file_structure.py](generate_rotated_file_structure.py)
+    - File loads images from a folder where the images are already rotated without structure. The images are moved to a destination folder and a folder is created for each rotation angle.
   - [train_rotated_coco_dateset.py](train_rotated_coco_dateset.py)
+    - File to train a model directly on rotated images.
 
 ### directories:
 

@@ -134,6 +134,12 @@ def crop_around_center(image, width, height):
 
 
 def rotate_image_and_plot(img_path, rotation_angle=90):
+    """
+    function plots the original, the rotated and the rotated and cropped image in one plot
+    :param img_path: path to the image
+    :param rotation_angle: rotation angle in degrees
+    :return:
+    """
     # image = tf.keras.preprocessing.image.load_img(img_path)
     image = tf.keras.utils.load_img(img_path)
     # img_array = tf.keras.preprocessing.image.img_to_array(image)
@@ -148,7 +154,6 @@ def rotate_image_and_plot(img_path, rotation_angle=90):
                                                    math.radians(rotation_angle)
                                                )
                                                )
-
     plt.figure(figsize=(10, 10))
     plt.subplots_adjust(top=0.9, hspace=0.3)
     ax1 = plt.subplot(3, 1, 1)
@@ -163,6 +168,12 @@ def rotate_image_and_plot(img_path, rotation_angle=90):
 
 
 def rotate_image_and_plot_from_array(img_arr, rotation_angle=90):
+    """
+    function plots the original, the rotated and the rotated and cropped image in one plot
+    :param img_arr: array with image
+    :param rotation_angle: angle in degree
+    :return:
+    """
     image_rotated_cropped = rotate_image_and_crop(img_arr, rotation_angle)
 
     plt.figure(figsize=(10, 10))
@@ -179,6 +190,13 @@ def rotate_image_and_plot_from_array(img_arr, rotation_angle=90):
 
 
 def rotate_image_and_crop(image, rotation_angle):
+    """
+    function rotates the given image by the specified rotation angle. After the rotation the image
+    is cropped to the largest possible rectangle and then resized to the old image size
+    :param image: image array
+    :param rotation_angle: rotation angle in degree as integer
+    :return: rotated image
+    """
     # image = image.numpy() if tf.is_tensor(image) else image
     image_height = image.shape[0]
     image_width = image.shape[1]
