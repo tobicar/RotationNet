@@ -51,3 +51,14 @@ model = tf.keras.models.load_model(model_path, custom_objects={"angle_error": he
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', helpers.angle_error])
 ##
 model.evaluate(val_ds_with_labels)
+## plot some pictures from the val set
+plt.figure(figsize=(10, 10))
+take_dataset = val_ds_with_labels.take(1)
+pred = model.predict(take_dataset)
+for images, labels in take_dataset:
+    for i in range(9):
+        ax = plt.subplot(3, 3, i + 1)
+        plt.imshow(images[i].numpy().astype("uint8"))
+        plt.title(f"Label: {labels[i].numpy().argmax()} Prediction: {pred[i].argmax()}")
+        plt.axis("off")
+
